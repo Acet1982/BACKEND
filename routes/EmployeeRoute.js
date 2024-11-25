@@ -5,7 +5,7 @@ import {
   deleteEmployees,
 } from "../controllers/EmployeeController.js";
 import {
-  verifyAdmin,
+  verifyCoordinator,
   verifyToken,
   verifyUserAuthorization,
 } from "../middlewares/JwtAuthUser.js";
@@ -18,10 +18,15 @@ router.post(
   "/create/:uid",
   validatorRegisterEmployee,
   verifyToken,
-  verifyAdmin,
+  verifyCoordinator,
   createEmployees
 );
-router.put("/update/:eid", verifyToken, verifyAdmin, updateEmployees);
-router.delete("/delete/:eid", verifyToken, verifyAdmin, deleteEmployees);
+router.put("/update/:eid", verifyToken, verifyCoordinator, updateEmployees);
+router.delete(
+  "/delete/:eid",
+  verifyToken,
+  verifyUserAuthorization,
+  deleteEmployees
+);
 
 export default router;

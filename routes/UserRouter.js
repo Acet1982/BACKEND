@@ -22,6 +22,7 @@ import { requireRefreshToken } from "../middlewares/JwtRefreshToken.js";
 import {
   ValidatorLoginBody,
   validatorRegisterBody,
+  validatorUpdateBody,
 } from "../middlewares/ValidateBodyFields.js";
 
 const router = Router();
@@ -41,7 +42,7 @@ router.post(
   register
 );
 //Verificar esta ruta si en realidad es necesaria o no...bv
-router.get("/", verifyToken, verifyAdmin, findAll);
+router.get("/", verifyToken, verifyUserAuthorization, findAll);
 router.put(
   "/update-role-administrator/:uid",
   verifyToken,
@@ -54,6 +55,15 @@ router.put(
   verifyAdmin,
   updateRoleCoordinator
 );
+
+router.put(
+  "/update/:uid",
+  validatorUpdateBody,
+  verifyToken,
+  verifyUserAuthorization,
+  updateUsers
+);
+
 router.delete(
   "/delete/:uid",
   verifyToken,
@@ -61,10 +71,7 @@ router.delete(
   deleteUsers
 );
 
-router.put("/update/:uid", verifyToken, updateUsers);
 // Verificar la ruta u opción de cambiar contraseña
 // router.put("/update-password/:uid", changePasswords);
-
-router.get("/protegida", verifyToken, profile);
 
 export default router;

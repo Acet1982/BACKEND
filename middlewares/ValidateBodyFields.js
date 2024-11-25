@@ -59,3 +59,31 @@ export const validatorRegisterEmployee = [
     .escape(),
   validationResultExpress,
 ];
+
+//Función encargada de validar los campos requeridos para el registro mediante express validator
+export const validatorUpdateBody = [
+  body("username", "Nombre no valido")
+    .optional({ checkFalsy: true })
+    .isString()
+    .notEmpty()
+    .trim()
+    .escape(),
+  body("lastname", "Apellido no valido")
+    .optional({ checkFalsy: true })
+    .isString()
+    .notEmpty()
+    .trim()
+    .escape(),
+  body("cc", "Cc no valida")
+    .optional({ checkFalsy: true })
+    .notEmpty()
+    .trim()
+    .isString()
+    .escape(),
+  body("email", "Formato de email inorreto")
+    .optional({ checkFalsy: true })
+    .trim()
+    .isEmail()
+    .normalizeEmail(),
+  validationResultExpress,
+];

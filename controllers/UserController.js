@@ -109,6 +109,18 @@ export const updateUsers = async (req, res) => {
       return res.status(403).json({ error: `Usuario no encontrado` });
     }
 
+    const searchEmail = await findOneByEmail(email);
+    if (searchEmail) {
+      return res
+        .status(403)
+        .json({ error: "Este email ya se encuentra registrado" });
+    }
+
+    const searchCc = await findOneByCc(cc);
+    if (searchCc) {
+      return res.status(403).json({ error: "Número de documento ya en uso" });
+    }
+
     const updatedUser = await updateUser({
       uid,
       username,

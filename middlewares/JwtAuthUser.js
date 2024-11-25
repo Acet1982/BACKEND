@@ -45,7 +45,7 @@ export const verifyCoordinator = (req, res, next) => {
     .json({ error: "Usuario no autorizado, solo coordinador." });
 };
 
-// Función encargada de verificar si el usuario es coordinador
+// Función encargada de verificar si el usuario es administrador o coordinador
 export const verifyUserAuthorization = (req, res, next) => {
   if (req.role_id === 1 || req.role_id === 2) {
     return next();

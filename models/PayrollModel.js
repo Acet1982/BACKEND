@@ -65,7 +65,7 @@ export const findOnePayrollCoordinator = async (pid, coordinator_id) => {
   const query = {
     text: `
     SELECT * FROM PAYROLLS 
-    WHERE PID = $1 AND COORDINATOR_ID = $2
+    WHERE PID = $1 AND COORDINATOR_ID = $2 AND STATE_ID = 1 OR STATE_ID =2
     `,
     values: [pid, coordinator_id],
   };

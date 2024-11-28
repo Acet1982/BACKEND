@@ -9,6 +9,7 @@ import {
 import {
   verifyAdmin,
   verifyCoordinator,
+  verifyUserAuthorization,
   verifyToken,
 } from "../middlewares/JwtAuthUser.js";
 

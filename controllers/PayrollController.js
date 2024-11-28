@@ -13,6 +13,7 @@ import jwt from "jsonwebtoken";
 import { verifyDate } from "../utils/VerifyDate.js";
 
 // Función encargada de recibir del cuerpo los datos de información de la nómina para registrar los datos
+// Aquí necesito verificar que exactamente exista en un mes y no en la fecha actual
 export const createPayrolls = async (req, res) => {
   try {
     const refreshTokenCookie = req.cookies.refreshToken;
@@ -30,11 +31,13 @@ export const createPayrolls = async (req, res) => {
 
     const { comments } = req.body;
 
-    const verifyPayroll = await findOnePayrollByPeriodCoordinator(uid, date);
-    if (verifyPayroll)
-      return res
-        .status(403)
-        .json({ error: "Ya existe una nóima durante este perioso" });
+    const searchPayroll = await findOnePayrollByPeriodCoordinator(date);
+    if (searchPayroll) {
+      return res.status(403).json({
+        error:
+          "Ups, Esta sede ya tiene una nómina registrada durante este corte",
+      });
+    }
 
     await createPayroll({
       coordinator_id: uid,

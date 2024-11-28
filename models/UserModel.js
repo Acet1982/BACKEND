@@ -44,7 +44,7 @@ export const findOneByCc = async (cc) => {
 export const findAll = async () => {
   const query = {
     text: `
-    SELECT * FROM users
+    SELECT * FROM USERS WHERE ROLE_ID = 1
     `,
   };
   const { rows } = await db.query(query);

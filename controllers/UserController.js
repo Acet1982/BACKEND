@@ -65,7 +65,7 @@ export const findAll = async (req, res) => {
     console.error(error);
     return res.status(500).json({
       ok: false,
-      msg: "Error de servidor",
+      error: "Error al intentar obtener los usuarios",
     });
   }
 };

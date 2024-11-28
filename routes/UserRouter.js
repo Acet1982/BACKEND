@@ -38,11 +38,17 @@ router.post(
   "/register",
   validatorRegisterBody,
   verifyToken,
+  verifyAdmin,
   verifyUserAuthorization,
   register
 );
-//Verificar esta ruta si en realidad es necesaria o no...bv
-router.get("/", verifyToken, verifyUserAuthorization, findAll);
+//Verificar esta ruta si en realidad es necesaria o no...
+//No es necesaria, pero la estoy usando de momento para mostrar todos los administradores
+// router.get("/", findAll);
+
+router.get("/administrators", verifyToken, verifyAdmin, findAll);
+router.get("/coordinators", verifyToken, verifyAdmin, findAllUserCoordinators);
+router.get("/employees", verifyToken, verifyAdmin, findAllUserEmployees);
 router.put(
   "/update-role-administrator/:uid",
   verifyToken,

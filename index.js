@@ -4,6 +4,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import UserRouter from "./routes/UserRouter.js";
 import EmployeeRouter from "./routes/EmployeeRoute.js";
+import PayrollRoute from "./routes/PayrollRoute.js";
+import DetailPayrollRoute from "./routes/DetailPayrollRoute.js";
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/api/enova/users", UserRouter);
 app.use("/api/enova/employees/", EmployeeRouter);
+app.use("/api/enova/payrolls/", PayrollRoute);
+app.use("/api/enova/payrolls/details/", DetailPayrollRoute);
 
 const PORT = process.env.PORT || 5000;
 

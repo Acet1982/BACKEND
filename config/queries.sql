@@ -73,10 +73,13 @@ CREATE TABLE PAYROLLS (
     FOREIGN KEY (COORDINATOR_ID) REFERENCES USERS(UID) ON DELETE CASCADE,
     SITE_ID INT NOT NULL,
     FOREIGN KEY (SITE_ID) REFERENCES SITES(SID) ON DELETE CASCADE,
+    SITE_NAME VARCHAR(100),
     PERIOD_ID INT NOT NULL,
     FOREIGN KEY (PERIOD_ID) REFERENCES PERIODS(PID),
+    PERIOD_NAME VARCHAR(50),
     STATE_ID INT NOT NULL DEFAULT 1,
     FOREIGN KEY (STATE_ID) REFERENCES STATES(SID),
+    STATE_NAME VARCHAR(50),
     COMMENTS TEXT,
     PAYROLL_DATE DATE DEFAULT CURRENT_DATE NOT NULL
 );
@@ -121,7 +124,6 @@ CREATE TABLE CONSOLIDATED_PAYROLL (
     TOTAL_DEDUCTIONS DECIMAL(10,2),
     TOTAL_PAYABLE DECIMAL(10,2)
 );
-
 
 CREATE TABLE BLACKLISTED_TOKENS (
   BTID SERIAL PRIMARY KEY,
@@ -205,4 +207,94 @@ CREATE TRIGGER trg_calculate_payroll_detail
 BEFORE INSERT OR UPDATE ON PAYROLL_DETAIL
 FOR EACH ROW
 EXECUTE FUNCTION calculate_payroll_detail();
+
+
+-- // --------------------------------------------\\ --
+-- Crear la función de buscar el nombre por SID para asignar en el campo SITE_ID
+CREATE OR REPLACE FUNCTION update_site_name()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Buscar el nombre de la sede correspondiente al SITE_ID
+    SELECT SITENAME INTO NEW.SITE_NAME
+    FROM SITES
+    WHERE SID = NEW.SITE_ID;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Crear trigger asignar el nombre de la sede por ID
+CREATE TRIGGER set_site_name
+BEFORE INSERT OR UPDATE ON PAYROLLS
+FOR EACH ROW
+EXECUTE FUNCTION update_site_name();
+
+
+
+
+-- // --------------------------------------------\\ --
+-- Crear la función de buscar el nombre por SID para asignar en el campo SITE_ID
+CREATE OR REPLACE FUNCTION update_period_name()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Buscar el nombre de la sede correspondiente al SITE_ID
+    SELECT PERIODTIME INTO NEW.PERIOD_NAME
+    FROM PERIODS
+    WHERE PID = NEW.PERIOD_ID;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Crear trigger asignar el nombre de la sede por ID
+CREATE TRIGGER set_period_name
+BEFORE INSERT OR UPDATE ON PAYROLLS
+FOR EACH ROW
+EXECUTE FUNCTION update_period_name();
+
+
+
+
+-- // --------------------------------------------\\ --
+-- Crear la función de buscar el nombre por SID para asignar en el campo SITE_ID
+CREATE OR REPLACE FUNCTION update_state_name()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Buscar el nombre de la sede correspondiente al SITE_ID
+    SELECT STATENAME INTO NEW.STATE_NAME
+    FROM STATES
+    WHERE SID = NEW.STATE_ID;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Crear trigger asignar el nombre de la sede por ID
+CREATE TRIGGER set_state_name
+BEFORE INSERT OR UPDATE ON PAYROLLS
+FOR EACH ROW
+EXECUTE FUNCTION update_state_name();
+
+
+
+
+-- // --------------------------------------------\\ --
+-- Crear la función de buscar el nombre por SID para asignar en el campo SITE_ID
+CREATE OR REPLACE FUNCTION update_coordinator_name()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Buscar el nombre de la sede correspondiente al SITE_ID
+    SELECT USERNAME INTO NEW.COORDINATOR_NAME
+    FROM USERS
+    WHERE UID = NEW.COORDINATOR_ID;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Crear trigger asignar el nombre de la sede por ID
+CREATE TRIGGER set_coordinator_name
+BEFORE INSERT OR UPDATE ON PAYROLLS
+FOR EACH ROW
+EXECUTE FUNCTION update_coordinator_name();
 

@@ -8,7 +8,7 @@ export const requireRefreshToken = (req, res, next) => {
         error: "Token no existe o no proporcionado",
       });
 
-    const { uid, username, lastname, role_id } = jwt.verify(
+    const { uid, username, lastname, role_id, site_id } = jwt.verify(
       refreshTokenCookie,
       process.env.JWT_REFRESH_TOKEN
     );
@@ -17,6 +17,7 @@ export const requireRefreshToken = (req, res, next) => {
     req.username = username;
     req.lastname = lastname;
     req.role_id = role_id;
+    req.site_id = site_id;
     next();
   } catch (error) {
     console.log(error);

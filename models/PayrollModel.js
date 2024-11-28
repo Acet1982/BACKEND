@@ -19,6 +19,22 @@ export const createPayroll = async ({
   return rows[0];
 };
 
+//Función encargada de buscar una nómina por periodo y coordinador para evitar duplicados durante un periodo
+export const findOnePayrollByPeriodCoordinator = async (
+  coordinator_id,
+  period_id
+) => {
+  const query = {
+    text: `
+    SELECT * FROM PAYROLLS
+    WHERE COORDINATOR_ID = $1 AND PERIOD_ID = $2 AND EXTRACT(MONTH FROM PAYROLL_DATE) = EXTRACT(MONTH FROM CURRENT_DATE)
+         AND EXTRACT(YEAR FROM PAYROLL_DATE) = EXTRACT(YEAR FROM CURRENT_DATE)`,
+    values: [coordinator_id, period_id],
+  };
+  const { rows } = await db.query(query);
+  return rows[0];
+};
+
 // Función encargada de retornar todas las nóminas en estado valida al administrador
 export const findAllPayrolls = async () => {
   const query = {

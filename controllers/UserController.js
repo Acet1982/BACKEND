@@ -16,7 +16,8 @@ import { generateRefreshToken, generateToken } from "../utils/TokenManager.js";
 
 // Función encargada de recibir del cuerpo los datos del usuario a registrar
 export const register = async (req, res) => {
-  const { username, lastname, cc, email, password, role_id } = req.body;
+  const { username, lastname, cc, site_id, email, password, role_id } =
+    req.body;
 
   const userCc = await findOneByCc(cc);
   if (userCc) {
@@ -44,16 +45,19 @@ export const register = async (req, res) => {
       username,
       lastname,
       cc,
+      site_id,
       email,
       password: hashedPassword,
       role_id,
     });
 
-    return res.status(201).json({ ok: true, newUser });
+    return res
+      .status(201)
+      .json({ ok: true, msg: "Usuario registrado con exito", newUser });
   } catch (error) {
     console.log(error);
+    return res.json({ Error: "Error al intentar registrar el usuario" });
   }
-  return res.status(201).json({ ok: true, msg: "Register" });
 };
 
 // Función encargada de mostrar todos los usuarios
@@ -251,6 +255,7 @@ export const login = async (req, res) => {
       user.username,
       user.lastname,
       user.role_id,
+      user.site_id,
       res
     );
 

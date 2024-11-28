@@ -14,6 +14,7 @@ export const validatorRegisterBody = [
   body("username", "Nombre no valido").isString().notEmpty().trim().escape(),
   body("lastname", "Apellido no valido").isString().notEmpty().trim().escape(),
   body("cc", "Cc no valida").notEmpty().trim().isString().escape(),
+  body("site_id", "Sede no ingresada").notEmpty().trim().isNumeric().escape(),
   body("email", "Formato de email inorreto")
     .optional({ checkFalsy: true })
     .trim()

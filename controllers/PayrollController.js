@@ -7,45 +7,39 @@ import {
   updatePayroll,
   deletePayroll,
   findOnePayrollCoordinator,
+  findOnePayrollByPeriodCoordinator,
 } from "../models/PayrollModel.js";
 import jwt from "jsonwebtoken";
+import { verifyDate } from "../utils/VerifyDate.js";
 
 // Función encargada de recibir del cuerpo los datos de información de la nómina para registrar los datos
-// Aquí necesito verificar que exactamente exista en un mes y no en la fecha actual
 export const createPayrolls = async (req, res) => {
   try {
     const refreshTokenCookie = req.cookies.refreshToken;
 
-    const { uid } = jwt.verify(
+    const { uid, site_id } = jwt.verify(
       refreshTokenCookie,
       process.env.JWT_REFRESH_TOKEN
     );
 
-    const dateNow = new Date();
-    const year = dateNow.getFullYear();
-    const month = (dateNow.getMonth() + 1).toString().padStart(2, "0");
-    const day = dateNow.getDate().toString().padStart(2, "0");
+    const date = verifyDate();
+    if (date === 3)
+      return res
+        .status(403)
+        .json({ error: "Fecha no valida para cargar nóminas" });
 
-    const dateNowFormat = `${year}-${month}-${day}`;
+    const { comments } = req.body;
 
-    const { site_id, period_id, comments } = req.body;
-
-    const searchPayroll = await findOnePayrollDate(
-      site_id,
-      period_id,
-      dateNowFormat
-    );
-    if (searchPayroll) {
-      return res.status(403).json({
-        error:
-          "Ups, Esta sede ya tiene una nómina registrada durante este corte",
-      });
-    }
+    const verifyPayroll = await findOnePayrollByPeriodCoordinator(uid, date);
+    if (verifyPayroll)
+      return res
+        .status(403)
+        .json({ error: "Ya existe una nóima durante este perioso" });
 
     await createPayroll({
       coordinator_id: uid,
       site_id,
-      period_id,
+      period_id: date,
       comments,
     });
 

@@ -1,14 +1,21 @@
 import { db } from "../config/database.js";
 
 // Función encargada de registrar un usuario
-export const create = async ({ username, lastname, cc, email, password }) => {
+export const create = async ({
+  username,
+  lastname,
+  cc,
+  site_id,
+  email,
+  password,
+}) => {
   const query = {
     text: `
-      INSERT INTO USERS (username, lastname, cc, email, password)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING username, lastname, cc, email,role_id, uid
+      INSERT INTO USERS (username, lastname, cc, site_id,email, password)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING username, lastname, cc, site_id,email,role_id, uid
       `,
-    values: [username, lastname, cc, email, password],
+    values: [username, lastname, cc, site_id, email, password],
   };
   const { rows } = await db.query(query);
   return rows[0];

@@ -27,7 +27,7 @@ export const register = async (req, res) => {
     //   process.env.JWT_REFRESH_TOKEN
     // );
 
-    // const { username, lastname, cc, site_id, email, password } = req.body;
+     const { username, lastname, cc, site_id, email, password } = req.body;
 
     // if (role_id === 1) {
     //   if (!email || !password) {

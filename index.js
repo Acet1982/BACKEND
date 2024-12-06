@@ -22,16 +22,11 @@ app.use("/api/enova/users", UserRouter);
 app.use("/api/enova/employees/", EmployeeRouter);
 app.use("/api/enova/payrolls/", PayrollRoute);
 app.use("/api/enova/payrolls/details/", DetailPayrollRoute);
+app.get("/", (req, res) => {
+  res.send("Api de Enova Tecnologia.");
+});
 
 const PORT = process.env.PORT || 5000;
-
-app.get("/", (req, res) => {
-  res.send("Ruta de usuarios funcionando correctamente.");
-});
-
-app.get("/hola", (req, res) => {
-  res.send("holis.");
-});
 
 app.listen(PORT, () => {
   console.info(`Servidor corriendo en el puerto ${PORT}`);

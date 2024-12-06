@@ -12,7 +12,7 @@ const app = express();
 app.use(
   cors({
     origin: ["https://frontend-sigen.vercel.app", "http://localhost:5173"],
-    // methods: "GET,POST,PUT,DELETE",
+    methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
 );

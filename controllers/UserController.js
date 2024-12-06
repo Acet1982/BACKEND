@@ -56,7 +56,7 @@ export const register = async (req, res) => {
     // let hashedPassword = null;
     // if (password) {
       const salt = await bcryptjs.genSalt(10);
-      hashedPassword = await bcryptjs.hash(password, salt);
+      const hashedPassword = await bcryptjs.hash(password, salt);
     // }
 
 

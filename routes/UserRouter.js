@@ -45,7 +45,7 @@ router.get("/refresh", requireRefreshToken, refreshToken);
 //   verifyUserAuthorization,
 //   register
 // );
-router.post("/register", register);
+router.post("/register", validatorRegisterBody, register);
 //Verificar esta ruta si en realidad es necesaria o no...
 //No es necesaria, pero la estoy usando de momento para mostrar todos los administradores
 // router.get("/", findAll);

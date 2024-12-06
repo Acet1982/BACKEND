@@ -6,13 +6,18 @@ const { Pool } = pg;
 const connectionString = process.env.DATABASE_URL;
 
 export const db = new Pool({
-  allowExitOnIdle: true, 
+  allowExitOnIdle: true,
   connectionString,
+  ssl: true,
 });
 
-try {
-  await db.query("SELECT NOW()");
-  console.info("DATABASE Connected");
-} catch (error) {
-  console.error(error);
-}
+// Probar conexión inicial
+(async () => {
+  try {
+    const res = await db.query("SELECT NOW()");
+    console.info("📊 DATABASE Connected at:", res.rows[0].now);
+  } catch (error) {
+    console.error("❌ DATABASE Connection Error:", error.message);
+    process.exit(1);
+  }
+})();

@@ -40,9 +40,6 @@ router.get("/refresh", requireRefreshToken, refreshToken);
 // RUTAS PRINCIPALES - ACCIONES A LOS USUARIOS
 router.post(
   "/register",
-  validatorRegisterBody,
-  verifyToken,
-  verifyUserAuthorization,
   register
 );
 //Verificar esta ruta si en realidad es necesaria o no...

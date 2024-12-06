@@ -25,12 +25,12 @@ app.use("/api/enova/payrolls/details/", DetailPayrollRoute);
 
 const PORT = process.env.PORT || 5000;
 
-router.get("/", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Ruta de usuarios funcionando correctamente.");
 });
 
-router.get("/hola", (req, res) => {
-  res.send("Ruta de usuarios funcionando correctamente.");
+app.get("/hola", (req, res) => {
+  res.send("holis.");
 });
 
 app.listen(PORT, () => {

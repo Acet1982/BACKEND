@@ -25,6 +25,10 @@ app.use("/api/enova/payrolls/details/", DetailPayrollRoute);
 
 const PORT = process.env.PORT || 5000;
 
+app.get("/ping", (req, res) => {
+  res.send("HOLA KAISER, ESTAMOS READY POR AQUÍ!!!");
+});
+
 app.listen(PORT, () => {
   console.info(`Servidor corriendo en el puerto ${PORT}`);
 });

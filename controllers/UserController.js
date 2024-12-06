@@ -20,12 +20,7 @@ import jwt from "jsonwebtoken";
 // Función encargada de recibir del cuerpo los datos del usuario a registrar
 export const register = async (req, res) => {
   try {
-    const refreshTokenCookie = req.cookies.refreshToken;
-
-    const { role_id } = jwt.verify(
-      refreshTokenCookie,
-      process.env.JWT_REFRESH_TOKEN
-    );
+    
 
     const { username, lastname, cc, site_id, email, password } = req.body;
 

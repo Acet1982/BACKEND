@@ -335,6 +335,7 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log(email);
     const user = await findOneByEmail(email);
 
     console.log(user);
@@ -343,7 +344,7 @@ export const login = async (req, res) => {
       return res.status(403).json({ error: "Usuario no encontrado" });
     }
     console.log(user);
-    
+
     const isMatch = await bcryptjs.compare(password, user.password);
 
     if (!isMatch)

@@ -8,7 +8,7 @@ const connectionString = process.env.DATABASE_URL;
 export const db = new Pool({
   allowExitOnIdle: true,
   connectionString,
-    ssl: true,
+    // ssl: true,
 });
 
 // Probar conexión inicial

@@ -38,14 +38,14 @@ router.get("/logout", logout);
 router.get("/refresh", requireRefreshToken, refreshToken);
 
 // RUTAS PRINCIPALES - ACCIONES A LOS USUARIOS
-// router.post(
-//   "/register",
-//   validatorRegisterBody,
-//   verifyToken,
-//   verifyUserAuthorization,
-//   register
-// );
-router.post("/register", validatorRegisterBody, register);
+router.post(
+  "/register",
+  validatorRegisterBody,
+  verifyToken,
+  verifyUserAuthorization,
+  register
+);
+
 //Verificar esta ruta si en realidad es necesaria o no...
 //No es necesaria, pero la estoy usando de momento para mostrar todos los administradores
 // router.get("/", findAll);

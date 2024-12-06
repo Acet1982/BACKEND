@@ -29,6 +29,10 @@ router.get("/", (req, res) => {
   res.send("Ruta de usuarios funcionando correctamente.");
 });
 
+router.get("/hola", (req, res) => {
+  res.send("Ruta de usuarios funcionando correctamente.");
+});
+
 app.listen(PORT, () => {
   console.info(`Servidor corriendo en el puerto ${PORT}`);
 });

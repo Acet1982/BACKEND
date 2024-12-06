@@ -20,33 +20,38 @@ import jwt from "jsonwebtoken";
 // Función encargada de recibir del cuerpo los datos del usuario a registrar
 export const register = async (req, res) => {
   try {
-    
+    const refreshTokenCookie = req.cookies.refreshToken;
+
+    const { role_id } = jwt.verify(
+      refreshTokenCookie,
+      process.env.JWT_REFRESH_TOKEN
+    );
 
     const { username, lastname, cc, site_id, email, password } = req.body;
 
-    // if (role_id === 1) {
-    //   if (!email || !password) {
-    //     return res.status(400).json({
-    //       ok: false,
-    //       error: "Correo y contraseña son obligatorios para este rol.",
-    //     });
-    //   }
+    if (role_id === 1) {
+      if (!email || !password) {
+        return res.status(400).json({
+          ok: false,
+          error: "Correo y contraseña son obligatorios para este rol.",
+        });
+      }
 
-    //   const userEmail = await findOneByEmail(email);
-    //   if (userEmail) {
-    //     return res.status(409).json({
-    //       ok: false,
-    //       error: "Esta dirección de correo ya se encuentra registrada.",
-    //     });
-    //   }
-    // }
+      const userEmail = await findOneByEmail(email);
+      if (userEmail) {
+        return res.status(409).json({
+          ok: false,
+          error: "Esta dirección de correo ya se encuentra registrada.",
+        });
+      }
+    }
 
-    // const userCc = await findOneByCc(cc);
-    // if (userCc) {
-    //   return res
-    //     .status(409)
-    //     .json({ ok: false, error: "Número de documento ya está registrado." });
-    // }
+    const userCc = await findOneByCc(cc);
+    if (userCc) {
+      return res
+        .status(409)
+        .json({ ok: false, error: "Número de documento ya está registrado." });
+    }
 
     let hashedPassword = null;
     if (password) {

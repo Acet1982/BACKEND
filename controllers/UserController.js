@@ -27,7 +27,8 @@ export const register = async (req, res) => {
     //   process.env.JWT_REFRESH_TOKEN
     // );
 
-     const { username, lastname, cc, site_id, email, password, role_id } = req.body;
+    const { username, lastname, cc, site_id, email, password, role_id } =
+      req.body;
 
     // if (role_id === 1) {
     //   if (!email || !password) {
@@ -55,10 +56,9 @@ export const register = async (req, res) => {
 
     // let hashedPassword = null;
     // if (password) {
-      const salt = await bcryptjs.genSalt(10);
-      const hashedPassword = await bcryptjs.hash(password, salt);
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
     // }
-
 
     //  const newUser = await create({
     //    username,
@@ -85,7 +85,9 @@ export const register = async (req, res) => {
       .json({ ok: true, msg: "Usuario registrado con éxito", newUser });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: "Error al intentar registrar el usuario" });
+    return res
+      .status(500)
+      .json({ error: "Error al intentar registrar el usuario" });
   }
 };
 
@@ -335,10 +337,13 @@ export const login = async (req, res) => {
 
     const user = await findOneByEmail(email);
 
+    console.log(user);
+
     if (!user) {
       return res.status(403).json({ error: "Usuario no encontrado" });
     }
-
+    console.log(user);
+    
     const isMatch = await bcryptjs.compare(password, user.password);
 
     if (!isMatch)

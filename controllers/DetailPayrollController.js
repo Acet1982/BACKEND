@@ -3,19 +3,60 @@ import {
   deleteDetailPayroll,
   findAllDetailsPayroll,
   findOneDetailsByPdid,
+  findPayrollDetailByPeriod,
   updateDetailPayroll,
 } from "../models/DetailPayrollModel.js";
+import { verifyPeriod } from "../utils/VerifyDate.js";
+
+export const findOneDetails = async (req, res) => {
+  try {
+    const { pdid } = req.params;
+
+    const payrollDetails = await findOneDetailsByPdid(pdid);
+    if (!payrollDetails) {
+      return res.status(400).json({ error: "Detalles de nómina existen" });
+    }
+
+    return res.json({ msg: payrollDetails });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(409)
+      .json({ error: "Error al intentar optener los detalles de la nómina" });
+  }
+};
+
+// Función encargada de retornar los detalles de nómina según el período
+export const findPayrollDetailPeriods = async (req, res) => {
+  try {
+    const period = verifyPeriod();
+    if (!period === 1 || !period === 2)
+      return res
+        .status(403)
+        .json({ error: "Período no valido para visualizar las nóminas" });
+
+    const payrollDetails = await findPayrollDetailByPeriod(period);
+
+    return res.status(200).json({ msg: payrollDetails });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error:
+        "Se ha presentado un error al intentar obtener los detalles de nómina por período, por favor intente más tarde.",
+    });
+  }
+};
 
 //Función encargada de retornar los detaller de nómina de un empleado
 export const findAllDetailsPayrolls = async (req, res) => {
   try {
-    const detailPayrollEmployee = await findAllDetailsPayroll();
-    return res.status(200).json({ detailPayrollEmployee });
+    const { pid } = req.params;
+    const detailPayrollSite = await findAllDetailsPayroll(pid);
+    return res.status(200).json({ msg: detailPayrollSite });
   } catch (error) {
     console.log(error);
     return res.json({
-      error:
-        "Error al intentar optener los detalles de nómina de los empleados",
+      error: "Error al intentar optener los detalles de nóminas de las sedes",
     });
   }
 };
@@ -39,7 +80,7 @@ export const createPayrollDetails = async (req, res) => {
       observations,
     } = req.body;
 
-    const nominaEmployee = await createPayrollDetail({
+    await createPayrollDetail({
       payroll_id: pid,
       employee_id: eid,
       days_worked,
@@ -58,12 +99,12 @@ export const createPayrollDetails = async (req, res) => {
 
     return res
       .status(201)
-      .json({ msg: "Detalles de nóimina cargados con exito", nominaEmployee });
+      .json({ msg: "Detalles de nóimina cargados con exito" });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       error:
-        "Se ha presentado un error en el servidor, por favor intente más tarde",
+        "Se ha presentado un error al intentar cargar los datos de la nómina, por favor intente más tarde",
     });
   }
 };

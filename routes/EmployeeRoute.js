@@ -3,6 +3,7 @@ import {
   createEmployees,
   updateEmployees,
   deleteEmployees,
+  getEmployees,
 } from "../controllers/EmployeeController.js";
 import {
   verifyCoordinator,
@@ -14,13 +15,8 @@ import { validatorRegisterEmployee } from "../middlewares/ValidateBodyFields.js"
 
 const router = Router();
 
-router.post(
-  "/create/:uid",
-  validatorRegisterEmployee,
-  verifyToken,
-  verifyCoordinator,
-  createEmployees
-);
+router.get("/:uid", verifyToken, verifyUserAuthorization, getEmployees);
+router.post("/create/:uid", validatorRegisterEmployee, createEmployees);
 router.put("/update/:eid", verifyToken, verifyCoordinator, updateEmployees);
 router.delete(
   "/delete/:eid",

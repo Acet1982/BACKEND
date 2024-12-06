@@ -4,35 +4,53 @@ import {
   findOneByEmail,
   findOneByCc,
   findAll as findAllUsers,
+  findAllEmployeesByCoordinator,
   findAllCoordinators,
-  findAllEmployees,
   findOneByUid,
   updateRoleAdministrator as updateRoleAdministratorUid,
   updateRoleCoordinator as updateRoleCoordinatorUid,
   updateUser,
   deleteUser,
+  findAllEmployees,
+  updateRoleInternalControl,
 } from "../models/UserModel.js";
 import { generateRefreshToken, generateToken } from "../utils/TokenManager.js";
+import jwt from "jsonwebtoken";
 
 // Función encargada de recibir del cuerpo los datos del usuario a registrar
 export const register = async (req, res) => {
-  const { username, lastname, cc, site_id, email, password, role_id } =
-    req.body;
-
-  const userCc = await findOneByCc(cc);
-  if (userCc) {
-    return res
-      .status(409)
-      .json({ ok: false, msg: "Número de documento ya esta registrado." });
-  }
-
   try {
-    const userEmail = await findOneByEmail(email);
-    if (userEmail) {
-      return res.status(409).json({
-        ok: false,
-        msg: "Esta dirección de correo ya se encuentra registrado.",
-      });
+    const refreshTokenCookie = req.cookies.refreshToken;
+
+    const { role_id } = jwt.verify(
+      refreshTokenCookie,
+      process.env.JWT_REFRESH_TOKEN
+    );
+
+    const { username, lastname, cc, site_id, email, password } = req.body;
+
+    if (role_id === 1) {
+      if (!email || !password) {
+        return res.status(400).json({
+          ok: false,
+          error: "Correo y contraseña son obligatorios para este rol.",
+        });
+      }
+
+      const userEmail = await findOneByEmail(email);
+      if (userEmail) {
+        return res.status(409).json({
+          ok: false,
+          error: "Esta dirección de correo ya se encuentra registrada.",
+        });
+      }
+    }
+
+    const userCc = await findOneByCc(cc);
+    if (userCc) {
+      return res
+        .status(409)
+        .json({ ok: false, error: "Número de documento ya está registrado." });
     }
 
     let hashedPassword = null;
@@ -46,14 +64,14 @@ export const register = async (req, res) => {
       lastname,
       cc,
       site_id,
-      email,
-      password: hashedPassword,
+      email: role_id === 1 ? email : null,
+      password: role_id === 1 ? hashedPassword : null,
       role_id,
     });
 
     return res
       .status(201)
-      .json({ ok: true, msg: "Usuario registrado con exito", newUser });
+      .json({ ok: true, msg: "Usuario registrado con éxito", newUser });
   } catch (error) {
     console.log(error);
     return res.json({ Error: "Error al intentar registrar el usuario" });
@@ -63,8 +81,20 @@ export const register = async (req, res) => {
 // Función encargada de mostrar todos los usuarios
 export const findAll = async (req, res) => {
   try {
-    const users = await findAllUsers();
-    return res.json({ ok: true, msg: users });
+    const refreshTokenCookie = req.cookies.refreshToken;
+
+    const { role_id, uid } = jwt.verify(
+      refreshTokenCookie,
+      process.env.JWT_REFRESH_TOKEN
+    );
+
+    if (role_id === 1) {
+      const users = await findAllUsers();
+      return res.json({ ok: true, msg: users });
+    } else if (role_id === 2) {
+      const users = await findAllEmployeesByCoordinator(uid);
+      return res.json({ ok: true, msg: users });
+    }
   } catch (error) {
     console.error(error);
     return res.status(500).json({
@@ -91,7 +121,14 @@ export const findAllUserCoordinators = async (req, res) => {
 // Función encargada de mostrar todos los coordinadores
 export const findAllUserEmployees = async (req, res) => {
   try {
-    const employees = await findAllEmployees();
+    const refreshTokenCookie = req.cookies.refreshToken;
+
+    const { site_id } = jwt.verify(
+      refreshTokenCookie,
+      process.env.JWT_REFRESH_TOKEN
+    );
+
+    const employees = await findAllEmployeesByCoordinator(site_id);
     return res.json({ ok: true, msg: employees });
   } catch (error) {
     console.error(error);
@@ -99,6 +136,31 @@ export const findAllUserEmployees = async (req, res) => {
       ok: false,
       msg: "Error de servidor",
     });
+  }
+};
+
+// Función encargada de mostrar todos los empleados al Administrador
+export const allEmployees = async (req, res) => {
+  try {
+    const refreshTokenCookie = req.cookies.refreshToken;
+
+    const { role_id, site_id } = jwt.verify(
+      refreshTokenCookie,
+      process.env.JWT_REFRESH_TOKEN
+    );
+
+    if (role_id === 1) {
+      const employees = await findAllEmployees();
+      return res.json({ msg: employees });
+    } else {
+      const employees = await findAllEmployeesByCoordinator(site_id);
+      return res.json({ msg: employees });
+    }
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(404)
+      .json({ error: "Error al intentar obtener todos los empleados" });
   }
 };
 
@@ -179,6 +241,29 @@ export const updateRoleCoordinator = async (req, res) => {
     return res.json({
       ok: true,
       msg: `Rol actualizado con exito a coordinador`,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      ok: false,
+      msg: "Error de servidor",
+    });
+  }
+};
+
+// Función encargada de actualizar el rol de un empleado o coordinador a administrador
+export const updateRoleInternalControls = async (req, res) => {
+  try {
+    const { uid } = req.params;
+
+    const user = await findOneByUid(uid);
+    if (!user) return res.status(404).json({ error: "Usuario no encontrado." });
+
+    await updateRoleInternalControl(uid);
+
+    return res.json({
+      ok: true,
+      msg: `Rol actualizado con exito a Control Interno`,
     });
   } catch (error) {
     console.error(error);
@@ -306,4 +391,23 @@ export const logout = (req, res) => {
     sameSite: "strict",
   });
   res.status(200).send("Sesión cerrada con éxito");
+};
+
+export const OneByUID = async (req, res) => {
+  try {
+    const { uid } = req.params;
+
+    const user = await findOneByUid(uid);
+    if (!user) {
+      return res.status(403).json({ error: "Usuario no encontrado" });
+    }
+
+    const oneUser = await findOneByUid(uid);
+    return res.json({ msg: oneUser });
+  } catch (error) {
+    console.log(error);
+    return res.json({
+      error: "Error al intentar mostrar la información del ususario",
+    });
+  }
 };

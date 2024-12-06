@@ -8,6 +8,10 @@ import {
   deletePayroll,
   findOnePayrollCoordinator,
   findOnePayrollByPeriodCoordinator,
+  allPayrollByPeriod,
+  validatedPayroll,
+  correctionPayroll,
+  correctedPayroll,
 } from "../models/PayrollModel.js";
 import jwt from "jsonwebtoken";
 import { verifyDate } from "../utils/VerifyDate.js";
@@ -29,9 +33,7 @@ export const createPayrolls = async (req, res) => {
         .status(403)
         .json({ error: "Fecha no valida para cargar nóminas" });
 
-    const { comments } = req.body;
-
-    const searchPayroll = await findOnePayrollByPeriodCoordinator(date);
+    const searchPayroll = await findOnePayrollByPeriodCoordinator(uid, date);
     if (searchPayroll) {
       return res.status(403).json({
         error:
@@ -43,7 +45,6 @@ export const createPayrolls = async (req, res) => {
       coordinator_id: uid,
       site_id,
       period_id: date,
-      comments,
     });
 
     return res.status(201).json({ msg: "Nómina creada con exito" });
@@ -56,13 +57,106 @@ export const createPayrolls = async (req, res) => {
 // Función encargada de mostrar todos los usuarios
 export const findAllPayroll = async (req, res) => {
   try {
-    const payroll = await findAllPayrolls();
-    return res.json({ msg: payroll });
+    const refreshTokenCookie = req.cookies.refreshToken;
+
+    const { uid, role_id } = jwt.verify(
+      refreshTokenCookie,
+      process.env.JWT_REFRESH_TOKEN
+    );
+
+    if (role_id === 1) {
+      const payroll = await findAllPayrolls();
+      return res.json({ msg: payroll });
+    }
+    if (role_id === 2) {
+      const payroll = await findAllPayrollsCoordinator(uid);
+      return res.json({ msg: payroll });
+    }
   } catch (error) {
     console.error(error);
     return res
       .status(500)
       .json({ error: "Se ha presentado un error en el servidor" });
+  }
+};
+
+// Función encargada de actualizar el estado de una nómina a validada
+export const validatedPayrolls = async (req, res) => {
+  try {
+    const { pid } = req.params;
+
+    const payroll = await findOnePayrollByPid(pid);
+    if (!payroll)
+      return res.status(404).json({ error: "Nómina no encontrada." });
+
+    await validatedPayroll(pid);
+
+    return res.json({
+      msg: `Nómina validada con exito`,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      msg: "Error al intentar validar la nómina",
+    });
+  }
+};
+
+// Función encargada de actualizar el estado de una nómina a correción
+export const correctPayrolls = async (req, res) => {
+  try {
+    const { pid } = req.params;
+
+    const payroll = await findOnePayrollByPid(pid);
+    if (!payroll)
+      return res.status(404).json({ error: "Nómina no encontrada." });
+
+    await correctionPayroll(pid);
+
+    return res.json({
+      msg: `Nómina enviada a correción`,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      msg: "Error al intentar enviar la nómina a correción",
+    });
+  }
+};
+
+// Función encargada de actualizar el estado de una nómina a corregida o en revisión
+export const correctedPayrolls = async (req, res) => {
+  try {
+    const { pid } = req.params;
+
+    const payroll = await findOnePayrollByPid(pid);
+    if (!payroll)
+      return res.status(404).json({ error: "Nómina no encontrada." });
+
+    await correctedPayroll(pid);
+
+    return res.json({
+      msg: `Nómina enviada a revisión`,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      msg: "Error al intentar enviar la nómina a revisión",
+    });
+  }
+};
+
+// Función encargada de mostrar todos los usuarios
+export const AllPayrollInternalControl = async (req, res) => {
+  try {
+    const payrolls = await allPayrollByPeriod();
+    return res.json({ msg: payrolls });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error:
+        "Se ha presentado un error al intentar optener las nóminas para el usuario control interno",
+    });
   }
 };
 

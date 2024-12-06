@@ -1,19 +1,14 @@
 import { db } from "../config/database.js";
 
 // Función encargada de crear una nómina
-export const createPayroll = async ({
-  coordinator_id,
-  site_id,
-  period_id,
-  comments,
-}) => {
+export const createPayroll = async ({ coordinator_id, site_id, period_id }) => {
   const query = {
     text: `
-      INSERT INTO PAYROLLS (coordinator_id, site_id, period_id, comments)
-      VALUES ($1, $2, $3, $4)
-      RETURNING coordinator_id, site_id, period_id, comments, pid
+      INSERT INTO PAYROLLS (coordinator_id, site_id, period_id)
+      VALUES ($1, $2, $3)
+      RETURNING coordinator_id, site_id, period_id,  pid
       `,
-    values: [coordinator_id, site_id, period_id, comments],
+    values: [coordinator_id, site_id, period_id],
   };
   const { rows } = await db.query(query);
   return rows[0];
@@ -35,6 +30,35 @@ export const findOnePayrollByPeriodCoordinator = async (
   return rows[0];
 };
 
+//Función encargada de traer las nóminas por periodo al control interno
+export const allPayrollByPeriod = async () => {
+  const query = {
+    text: `
+      WITH PeriodDetails AS (
+        SELECT 
+          *,
+          CASE 
+            WHEN EXTRACT(DAY FROM PAYROLL_DATE) BETWEEN 1 AND 14 THEN 1
+            WHEN EXTRACT(DAY FROM PAYROLL_DATE) BETWEEN 15 AND 31 THEN 2
+            ELSE NULL
+          END AS PERIOD
+        FROM PAYROLLS
+      )
+      SELECT *
+      FROM PeriodDetails
+      WHERE PERIOD = CASE 
+                      WHEN CURRENT_DATE BETWEEN DATE_TRUNC('month', CURRENT_DATE) 
+                                              AND DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '13 days' THEN 1
+                      ELSE 2
+                    END;
+    `,
+  };
+
+  const { rows } = await db.query(query); // Ejecuta la consulta
+  return rows; // Devuelve los resultados
+};
+
+
 // Función encargada de retornar todas las nóminas en estado valida al administrador
 export const findAllPayrolls = async () => {
   const query = {
@@ -47,12 +71,61 @@ export const findAllPayrolls = async () => {
   return rows;
 };
 
+
+// Función encargada de actualizar el estado de una nómina a validada
+export const validatedPayroll = async (pid) => {
+  const query = {
+    text: `
+    UPDATE PAYROLLS
+    SET state_id = 3
+    WHERE pid = $1
+    RETURNING state_id
+    `,
+    values: [pid],
+  };
+  const { rows } = await db.query(query);
+  return rows[0];
+};
+
+
+// Función encargada de actualizar el estado de una nómina a correción
+export const correctionPayroll = async (pid) => {
+  const query = {
+    text: `
+    UPDATE PAYROLLS
+    SET state_id = 2
+    WHERE pid = $1
+    RETURNING state_id
+    `,
+    values: [pid],
+  };
+  const { rows } = await db.query(query);
+  return rows[0];
+};
+
+
+// Función encargada de actualizar el estado de una nómina a correción
+export const correctedPayroll = async (pid) => {
+  const query = {
+    text: `
+    UPDATE PAYROLLS
+    SET state_id = 1
+    WHERE pid = $1
+    RETURNING state_id
+    `,
+    values: [pid],
+  };
+  const { rows } = await db.query(query);
+  return rows[0];
+};
+
+
 // Función encargada de retornar todas las nóminas por coordinador
 export const findAllPayrollsCoordinator = async (coordinator_id) => {
   const query = {
     text: `
     SELECT * FROM PAYROLLS 
-    WHERE COORDINATOR_ID = $1
+    WHERE COORDINATOR_ID = $1 AND (STATE_ID = 1 OR STATE_ID = 2)
     `,
     values: [coordinator_id],
   };

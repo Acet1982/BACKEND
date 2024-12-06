@@ -49,10 +49,9 @@ export const validatorRegisterEmployee = [
   body("account_number", "Número de cuenta no valido")
     .isNumeric()
     .isLength({ min: 10 })
-    .withMessage("El número de cuenta debe tener minimo 10 dígitos")
+    .withMessage({ error: "El número de cuenta debe tener minimo 10 dígitos" })
     .trim()
     .escape(),
-  body("site_id", "Sede no valida").isNumeric().notEmpty().trim().escape(),
   body("monthly_salary", "Valor de salario no valido")
     .isNumeric()
     .isLength({ min: 1 })

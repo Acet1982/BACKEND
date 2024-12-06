@@ -4,16 +4,15 @@ export const createEmployee = async ({
   user_id,
   bank_id,
   account_number,
-  site_id,
   monthly_salary,
 }) => {
   const query = {
     text: `
-      INSERT INTO EMPLOYEES (user_id, bank_id, account_number, site_id, monthly_salary)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING user_id, bank_id, account_number, site_id, monthly_salary, eid
+      INSERT INTO EMPLOYEES (user_id, bank_id, account_number, monthly_salary)
+      VALUES ($1, $2, $3, $4)
+      RETURNING user_id, bank_id, account_number, monthly_salary, eid
       `,
-    values: [user_id, bank_id, account_number, site_id, monthly_salary],
+    values: [user_id, bank_id, account_number, monthly_salary],
   };
   const { rows } = await db.query(query);
   return rows[0];
@@ -41,13 +40,13 @@ export const findAllEmployees = async () => {
   return rows;
 };
 
-export const findOneByEid = async (eid) => {
+export const findOneByEid = async (uid) => {
   const query = {
     text: `
     SELECT * FROM EMPLOYEES
-    WHERE eid = $1
+    WHERE user_id = $1
     `,
-    values: [eid],
+    values: [uid],
   };
   const { rows } = await db.query(query);
   return rows[0];

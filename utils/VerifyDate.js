@@ -1,5 +1,3 @@
-import { response } from "express";
-
 // Función para determinar el período
 export const verifyDate = () => {
   const today = new Date();
@@ -12,5 +10,16 @@ export const verifyDate = () => {
     return 2;
   } else {
     return 3;
+  }
+};
+
+export const verifyPeriod = () => {
+  const today = new Date();
+  const day = today.getDate();
+
+  if (day >= 1 && day <= 14) {
+    return 1;
+  } else {
+    return 2;
   }
 };

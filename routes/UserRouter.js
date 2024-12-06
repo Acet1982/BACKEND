@@ -12,9 +12,13 @@ import {
   profile,
   refreshToken,
   logout,
+  OneByUID,
+  allEmployees,
+  updateRoleInternalControls,
 } from "../controllers/UserController.js";
 import {
   verifyAdmin,
+  verifyCoordinator,
   verifyToken,
   verifyUserAuthorization,
 } from "../middlewares/JwtAuthUser.js";
@@ -38,17 +42,16 @@ router.post(
   "/register",
   validatorRegisterBody,
   verifyToken,
-  verifyAdmin,
   verifyUserAuthorization,
   register
 );
 //Verificar esta ruta si en realidad es necesaria o no...
 //No es necesaria, pero la estoy usando de momento para mostrar todos los administradores
 // router.get("/", findAll);
-
+router.get("/info/:uid", OneByUID);
 router.get("/administrators", verifyToken, verifyAdmin, findAll);
 router.get("/coordinators", verifyToken, verifyAdmin, findAllUserCoordinators);
-router.get("/employees", verifyToken, verifyAdmin, findAllUserEmployees);
+router.get("/employees", verifyToken, verifyUserAuthorization, allEmployees);
 router.put(
   "/update-role-administrator/:uid",
   verifyToken,
@@ -60,6 +63,12 @@ router.put(
   verifyToken,
   verifyAdmin,
   updateRoleCoordinator
+);
+router.put(
+  "/update-role-internal-control/:uid",
+  verifyToken,
+  verifyAdmin,
+  updateRoleInternalControls
 );
 
 router.put(

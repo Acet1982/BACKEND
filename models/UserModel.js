@@ -25,8 +25,10 @@ export const create = async ({
 export const findOneByEmail = async (email) => {
   const query = {
     text: `
-    SELECT * FROM users
-    WHERE EMAIL = $1
+    SELECT * 
+    FROM users
+    WHERE email = $1;
+
     `,
     values: [email],
   };
@@ -58,6 +60,18 @@ export const findAll = async () => {
   return rows;
 };
 
+// Función encargada de retornar todos los empleados de un cooridnador
+export const findAllEmployeesByCoordinator = async (site_id) => {
+  const query = {
+    text: `
+    SELECT * FROM USERS WHERE ROLE_ID = 3 AND SITE_ID = $1
+    `,
+    values: [site_id],
+  };
+  const { rows } = await db.query(query);
+  return rows;
+};
+
 // Función encargada de retornar todos los coordinadores
 export const findAllCoordinators = async () => {
   const query = {
@@ -69,7 +83,7 @@ export const findAllCoordinators = async () => {
   return rows;
 };
 
-// Función encargada de retornar todos los empleados
+// Función encargada de retornar todos los empleados al Administrador
 export const findAllEmployees = async () => {
   const query = {
     text: `
@@ -122,6 +136,23 @@ export const updateRoleCoordinator = async (uid) => {
   const { rows } = await db.query(query);
   return rows[0];
 };
+
+
+// Función encargada de actualizar el rol de un empleado a control interno
+export const updateRoleInternalControl = async (uid) => {
+  const query = {
+    text: `
+    UPDATE users
+    SET role_id = 5
+    WHERE uid = $1
+    RETURNING role_id
+    `,
+    values: [uid],
+  };
+  const { rows } = await db.query(query);
+  return rows[0];
+};
+
 
 // Función encargada de actualizar un usuario
 export const updateUser = async ({

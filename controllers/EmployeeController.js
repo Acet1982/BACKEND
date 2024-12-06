@@ -6,32 +6,50 @@ import {
   findOneByUserId,
 } from "../models/EmployeeModel.js";
 
+// Función encargada de retornar los empleados
+export const getEmployees = async (req, res) => {
+  try {
+    const { uid } = req.params;
+
+    const employee = await findOneByEid(uid);
+    if (!employee) {
+      return res.status(409).json({ error: "Empleado no encontrado" });
+    }
+    return res.json({ msg: employee });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Error al intentar obtener los usuarios",
+    });
+  }
+};
+
 // Función encargada de recibir del cuerpo los datos de información del empleados para registrar los datos
 export const createEmployees = async (req, res) => {
   try {
-    const { uid } = req.params;
-    const { bank_id, account_number, site_id, monthly_salary } = req.body;
+    const { user_id, bank_id, account_number, monthly_salary } = req.body;
 
-    const employee = await findOneByUserId(uid);
+    const employee = await findOneByUserId(user_id);
     if (employee) {
       return res
         .status(403)
         .json({ error: "Ups, empleado ya cuenta con la información cargada" });
     }
 
-    const newEmployee = await createEmployee({
-      user_id: uid,
+    await createEmployee({
+      user_id,
       bank_id,
       account_number,
-      site_id,
       monthly_salary,
     });
 
-    return res.status(201).json({ ok: true, newEmployee });
+    return res.status(201).json({ msg: "Informacion guardada con exito" });
   } catch (error) {
     console.log(error);
+    return res.json({
+      error: "Error al intengar guardar información del usuario",
+    });
   }
-  return res.status(201).json({ ok: true, msg: "Register" });
 };
 
 // Función encargada de actualizar los datos de un empleado

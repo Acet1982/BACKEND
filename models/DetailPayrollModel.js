@@ -70,12 +70,26 @@ export const createPayrollDetail = async ({
 };
 
 // Función encargada de retornar todos los detalles de nóminas de empleado
-export const findAllDetailsPayroll = async () => {
+export const findAllDetailsPayroll = async (pid) => {
   const query = {
     text: `
-    SELECT * FROM PAYROLL_DETAIL
+    SELECT * FROM PAYROLL_DETAIL WHERE PAYROLL_ID = $1
     `,
+    values: [pid],
   };
+  const { rows } = await db.query(query);
+  return rows;
+};
+
+// Función encargada de buscar los detalles de nóminas por período
+export const findPayrollDetailByPeriod = async (period) => {
+  const tableName =
+    period === 1 ? "payroll_detail_period1" : "payroll_detail_period2";
+
+  const query = {
+    text: `SELECT * FROM ${tableName}`,
+  };
+
   const { rows } = await db.query(query);
   return rows;
 };

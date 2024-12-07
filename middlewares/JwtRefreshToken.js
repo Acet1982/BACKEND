@@ -3,24 +3,30 @@ import jwt from "jsonwebtoken";
 export const requireRefreshToken = (req, res, next) => {
   try {
     const refreshTokenCookie = req.cookies.refreshToken;
-    if (!refreshTokenCookie)
-      return res.status(401).json({
-        error: "Token no existe o no proporcionado",
-      });
 
-    const { uid, username, lastname, role_id, site_id } = jwt.verify(
+    if (!refreshTokenCookie) {
+      return res.status(401).json({
+        error: "Token no proporcionado. Por favor, inicia sesión nuevamente.",
+      });
+    }
+
+    const payload = jwt.verify(
       refreshTokenCookie,
       process.env.JWT_REFRESH_TOKEN
     );
 
-    req.uid = uid;
-    req.username = username;
-    req.lastname = lastname;
-    req.role_id = role_id;
-    req.site_id = site_id;
+    req.uid = payload.uid;
+    req.username = payload.username;
+    req.lastname = payload.lastname;
+    req.role_id = payload.role_id;
+    req.site_id = payload.site_id;
+
     next();
   } catch (error) {
-    console.log(error);
-    res.status(401).json({ error: tokenVerificationErrors[error.message] });
+    console.error("Error en requireRefreshToken:", error.message);
+    return res.status(401).json({
+      error: tokenVerificationErrors[error.message] || "Token inválido.",
+    });
   }
 };
+;

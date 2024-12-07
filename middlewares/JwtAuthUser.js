@@ -8,22 +8,25 @@ export const verifyToken = (req, res, next) => {
 
     if (!token || !token.startsWith("Bearer ")) {
       return res.status(401).json({
-        error: "Token no proporcionado o formato inválido",
+        error: "Token no proporcionado o formato inválido.",
       });
     }
 
     token = token.split(" ")[1];
-    const { uid, role_id } = jwt.verify(token, process.env.JWT_SECRET);
-    req.uid = uid;
-    req.role_id = role_id;
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.uid = payload.uid;
+    req.role_id = payload.role_id;
+
     next();
   } catch (error) {
-    console.log(error.message);
+    console.error("Error en verifyToken:", error.message);
     return res.status(401).json({
-      error: tokenVerificationErrors[error.message] || "Token inválido",
+      error: tokenVerificationErrors[error.message] || "Token inválido.",
     });
   }
 };
+
 
 // Función encargada de verificar si el usuario es administrador
 export const verifyAdmin = (req, res, next) => {

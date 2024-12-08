@@ -26,9 +26,8 @@ export const getEmployees = async (req, res) => {
 
 // Función encargada de recibir del cuerpo los datos de información del empleados para registrar los datos
 export const createEmployees = async (req, res) => {
-  const { user_id } = req.params;
   try {
-    const { bank_id, account_number, monthly_salary } = req.body;
+    const { user_id, bank_id, account_number, monthly_salary } = req.body;
 
     const employee = await findOneByUserId(user_id);
     if (employee) {

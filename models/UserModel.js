@@ -64,7 +64,7 @@ export const findAll = async () => {
 export const findAllEmployeesByCoordinator = async (site_id) => {
   const query = {
     text: `
-    SELECT * FROM USERS WHERE ROLE_ID = 3 AND SITE_ID = $1
+    SELECT * FROM USERS WHERE ROLE_ID = 3 OR ROLE_ID = 2 AND SITE_ID = $1
     `,
     values: [site_id],
   };

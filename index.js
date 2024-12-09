@@ -6,6 +6,7 @@ import UserRouter from "./routes/UserRouter.js";
 import EmployeeRouter from "./routes/EmployeeRoute.js";
 import PayrollRoute from "./routes/PayrollRoute.js";
 import DetailPayrollRoute from "./routes/DetailPayrollRoute.js";
+import SitesRoute from "./routes/SitesRoute.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/enova/users", UserRouter);
 app.use("/api/enova/employees/", EmployeeRouter);
 app.use("/api/enova/payrolls/", PayrollRoute);
 app.use("/api/enova/payrolls/details/", DetailPayrollRoute);
+app.use("/api/enova/sites/", SitesRoute);
 app.get("/", (req, res) => {
   res.send("Api de Enova Tecnologia.");
 });

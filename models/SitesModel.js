@@ -4,7 +4,7 @@ export const createSite = async ({ sitename }) => {
   const query = {
     text: `
       INSERT INTO SITES (sitename)
-      VALUES ($1, $2)
+      VALUES ($1)
       RETURNING sitename,sid
       `,
     values: [sitename],
@@ -17,7 +17,7 @@ export const findOneBySiteName = async (sitename) => {
   const query = {
     text: `
     SELECT * FROM SITES
-    WHERE SITEMANE = $1
+    WHERE SITENAME = $1
     `,
     values: [sitename],
   };
@@ -78,7 +78,7 @@ export const deleteSite = async (sid) => {
   const query = {
     text: `
       DELETE FROM SITES
-      WHERE bid = $1
+      WHERE sid = $1
       RETURNING sid, sitename
     `,
     values: [sid],

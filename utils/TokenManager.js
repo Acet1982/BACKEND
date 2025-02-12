@@ -36,7 +36,7 @@ export const generateRefreshToken = (
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "None",
+      sameSite: "none",
       expires: new Date(Date.now() + expiresIn * 1000),
     });
 

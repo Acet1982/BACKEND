@@ -12,7 +12,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://sigen-nine.vercel.app"],
+    origin: ["https://sigen-six.vercel.app"],
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   })
